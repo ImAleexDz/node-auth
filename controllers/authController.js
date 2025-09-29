@@ -102,3 +102,33 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+//Change password
+exports.changePassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { oldPassword, newPassword } = req.body;
+
+        // Find user by id
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if old password matches
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Old password is incorrect' });
+        }
+
+        // Hash the new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+        user.password = hashedNewPassword;
+        await user.save();
+
+        res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}

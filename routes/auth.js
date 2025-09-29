@@ -9,7 +9,7 @@ router.post('/register', authController.register);
 // Edit user route
 router.put('/edit/:id', validateUserUpdate, authController.editUser);
 
-// Get user details (for testing purposes)
+// Get user details
 router.get('/user/:id', authController.getUser);
 
 // Get users list
@@ -17,5 +17,8 @@ router.get('/users', authController.getUsers);
 
 //Delete user
 router.delete('/delete/:id', authController.deleteUser);
+
+//Change password
+router.post('/change-password/:id', authController.changePassword);
 
 module.exports = router;
