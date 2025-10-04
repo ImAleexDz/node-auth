@@ -21,4 +21,7 @@ router.delete('/delete/:id', authController.deleteUser);
 //Change password
 router.post('/change-password/:id', authController.changePassword);
 
+// Confirm account
+router.get('/confirm/:token', authController.confirmAccount);
+
 module.exports = router;

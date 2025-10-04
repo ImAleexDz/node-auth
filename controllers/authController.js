@@ -1,9 +1,11 @@
 
 // Controller for authentication logic
 const User = require('../models/user');
+const crypto = require('crypto')
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 
+// Register user
 exports.register = async (req, res) => {
     try {
         const { email, username, password, phone } = req.body;
@@ -12,7 +14,8 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create a new user with hashed password
-        const newUser = await User.create({ email, username, password: hashedPassword, phone });
+        const confirmationtoken = crypto.randomBytes(32).toString('hex');
+        const newUser = await User.create({ email, username, password: hashedPassword, phone, confirmationtoken });
         res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (error) {
         console.error('Error registering user:', error);
@@ -129,6 +132,25 @@ exports.changePassword = async (req, res) => {
         res.json({ message: 'Password changed successfully' });
     } catch (error) {
         console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+// Confirm user account
+exports.confirmAccount = async (req, res) => {
+    try {
+        const { token } = req.params;
+        // Find user by confirmation token
+        const user = await User.findOne({ where: { confirmationtoken: token } });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid confirmation token' });
+        }
+        user.isConfirmed = true;
+        user.confirmationToken = null; // Clear the token
+        await user.save();
+        res.json({ message: 'Account confirmed successfully' });
+    } catch (error) {
+        console.error('Error confirming account:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
