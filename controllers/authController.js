@@ -13,10 +13,16 @@ exports.register = async (req, res) => {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        //Check if user already exists
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
         // Create a new user with hashed password
         const confirmationtoken = crypto.randomBytes(32).toString('hex');
         const newUser = await User.create({ email, username, password: hashedPassword, phone, confirmationtoken });
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
+        res.status(201).json({ message: 'User registered successfully', user: newUser });        
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: 'Internal server error' });
