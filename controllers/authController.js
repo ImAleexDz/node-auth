@@ -4,6 +4,7 @@ const User = require('../models/user');
 const crypto = require('crypto')
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
+const {sendEmail} = require('../utils/mails/mailer.ts');
 
 // Register user
 exports.register = async (req, res) => {
@@ -22,7 +23,15 @@ exports.register = async (req, res) => {
         // Create a new user with hashed password
         const confirmationtoken = crypto.randomBytes(32).toString('hex');
         const newUser = await User.create({ email, username, password: hashedPassword, phone, confirmationtoken });
-        res.status(201).json({ message: 'User registered successfully', user: newUser });        
+
+        // Send confirmation email
+        const emailResult = await sendEmail(email, confirmationtoken);   
+        if (emailResult && emailResult.success === false) {
+            return res.status(500).json({ message: 'Registration failed: could not send confirmation email.' });
+        }
+
+        res.status(201).json({ message: 'User registered successfully', user: newUser });  
+           
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: 'Internal server error' });
