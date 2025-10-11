@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
             email: user.email,
             username: user.username,
         }
-        res.json({ message: 'Login successful', userObject, token });
+        res.json({ message: 'Login successful', userInfo, token });
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ message: 'Internal server error' });
