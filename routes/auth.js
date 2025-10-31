@@ -3,6 +3,20 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const validateUserUpdate = require('../middlewares/validateUserUpdate');
 const authMiddleware = require('../middlewares/authMiddleware');
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+
+// Google OAuth route
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email']}));
+
+router.get('/google/callback',
+    passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login` }),
+    (req, res) => {
+        const token = jwt.sign({ id: req.user.id, role: req.user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
+        //redirect to frontend with token
+        res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}`);
+    }
+)
 
 // Register route
 router.post('/register', authController.register);

@@ -6,9 +6,10 @@ const sequelize = require('./config/db');
 require('./models/user');
 
 const session = require('express-session');
-// const passport = require('passport');
-// require('./config/passport');
+const passport = require('passport');
+require('./config/passport');
 
+app.use(passport.initialize())
 
 sequelize.sync()
   .then(() => {

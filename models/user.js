@@ -31,6 +31,11 @@ const User = sequelize.define('User', {
       is: /^[0-9+\-() ]*$/i // Basic validation for phone numbers
     }
   },
+  googleId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
