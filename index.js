@@ -1,7 +1,7 @@
 
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 3002;
 const sequelize = require('./config/db');
 require('./models/user');
 
@@ -9,6 +9,19 @@ const session = require('express-session');
 const passport = require('passport');
 require('./config/passport');
 
+require('dotenv').config();
+const cors = require('cors');
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001';
+const corsOptions = {
+  origin: FRONTEND_URL,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type','Authorization','X-Requested-With'],
+  credentials: true,
+  optionSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 app.use(passport.initialize())
 
 sequelize.sync()

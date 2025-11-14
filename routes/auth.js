@@ -14,7 +14,7 @@ router.get('/google/callback',
     (req, res) => {
         const token = jwt.sign({ id: req.user.id, role: req.user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
         //redirect to frontend with token
-        res.redirect(`${process.env.FRONTEND_URL}/auth/success?token=${token}`);
+        res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
     }
 )
 
