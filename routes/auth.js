@@ -39,4 +39,18 @@ router.post('/change-password/:id', authMiddleware, authController.changePasswor
 // Confirm account
 router.get('/confirm/:token', authController.confirmAccount);
 
+//Add /me endporint to verify after token verification
+// router.get('/me', authMiddleware, (req, res) => {
+//     try {
+//         res.json({
+//             id: req.user.id,
+//             email: req.user.email,
+//             authenticated: true
+//         });
+//     } catch (error) {
+//         console.log('Error in /me endpoint: ', error)
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// })
+
 module.exports = router;

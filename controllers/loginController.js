@@ -23,6 +23,20 @@ exports.login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
+
+        //Set secure cookie with NextAuth name
+        const cookieName = process.env.NODE_ENV === 'production' 
+            ? '__Secure-next-auth.session-token' 
+            : 'next-auth.session-token';
+
+        res.cookie(cookieName, token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 1000, // 1 hour
+            path: '/'
+        })
+
         user.password = undefined;
         userInfo = {
             id: user.id,
