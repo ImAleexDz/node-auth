@@ -13,8 +13,23 @@ router.get('/google/callback',
     passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login` }),
     (req, res) => {
         const token = jwt.sign({ id: req.user.id, role: req.user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Set cookie with token (same as login controller)
+        const cookieName = process.env.NODE_ENV === 'production' 
+            ? '__Secure-next-auth.session-token' 
+            : 'next-auth.session-token';
+
+        res.cookie(cookieName, token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 1000, // 1 hour
+            path: '/'
+        });
+
         //redirect to frontend with token
-        res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
+        res.redirect(`${process.env.FRONTEND_URL}/`);
+        
     }
 )
 
@@ -38,19 +53,5 @@ router.post('/change-password/:id', authMiddleware, authController.changePasswor
 
 // Confirm account
 router.get('/confirm/:token', authController.confirmAccount);
-
-//Add /me endporint to verify after token verification
-// router.get('/me', authMiddleware, (req, res) => {
-//     try {
-//         res.json({
-//             id: req.user.id,
-//             email: req.user.email,
-//             authenticated: true
-//         });
-//     } catch (error) {
-//         console.log('Error in /me endpoint: ', error)
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// })
 
 module.exports = router;
